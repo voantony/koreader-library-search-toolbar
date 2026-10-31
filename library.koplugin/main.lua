@@ -907,7 +907,9 @@ function Library:showPageJump(view)
     local dialog
     local function go()
         local n = tonumber(dialog:getInputText())
-        if not n then return end
+        -- Empty or not a number: leave the box open. Out of range is clamped
+        -- by goToPage. Cancel is the way out without moving.
+        if not n or n ~= n then return end
         UIManager:close(dialog)
         view:goToPage(math.floor(n))
     end

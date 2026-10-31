@@ -16,7 +16,10 @@ Layout, top to bottom:
 Inside a series the books are in series order and numbered ("3 · Title").
 Paging past the last page (swipe or page key) opens the next series, and
 before the first page the previous one, so a whole shelf of series can be
-flipped through without going back to the list.
+flipped through without going back to the list. A long-press on a page
+arrow jumps to the first or last page of the list on screen (a tab, a
+folder, search results, or the series that is open). A tap still moves
+one page.
 
 The search bar is a real InputText embedded in this widget, not a popup:
 tapping it shows the Library keyboard and every keystroke re-filters the
@@ -768,6 +771,7 @@ function LibraryView:buildFooter(page, pages, total, kind)
         if pos then left = left .. " · " .. T(_("series %1 of %2 · swipe on for the next"), pos, count) end
     end
     -- Page arrows are real buttons (a thumb-sized target each), as well as swipes.
+    -- A tap moves one page. A long-press jumps to the first or last page.
     local touch = Tiles.minTouch()
     local icon = Screen:scaleBySize(20)
     local function arrow(name, dir, enabled)
@@ -778,13 +782,16 @@ function LibraryView:buildFooter(page, pages, total, kind)
             enabled = enabled,
             allow_flash = false, -- the page redraw is the feedback: one refresh, not two
             callback = function() self:turnPage(dir, false) end,
+            hold_callback = function() self:jumpToEnd(dir) end,
             show_parent = self,
         }
         if not enabled and btn.image then btn.image.dim = true end
         return btn
     end
     local more = self:inSeries() -- past the last page: the next series
-    -- "63 / 72": tap it to type a page number (only when there is more than one page).
+    -- "3 / 12": its own tap target between the arrows, only as wide as the
+    -- number, and only a tap. A tap opens the number box. A long-press on an
+    -- arrow still jumps to the first or last page. One page: nothing to type.
     local page_label = TextWidget:new{ text = T(_("%1 / %2"), page, pages), face = f, bold = true }
     self.page_label = nil
     if pages > 1 then
@@ -1577,6 +1584,16 @@ function LibraryView:stepSeries(dir)
     self:applyRemembered()
     self:refreshBody(true)
     return true
+end
+
+--- Long-press on a page arrow: the first page (dir < 0) or the last (dir > 0)
+-- of the list on screen. Already there, or only one page: nothing happens
+-- and the screen is not rebuilt, so a following tap can still open a book.
+-- Stays inside the open folder or series. A tap still steps to the
+-- neighbouring series from either end.
+function LibraryView:jumpToEnd(dir)
+    if not self.pages then return end
+    self:goToPage(dir < 0 and 1 or self.pages)
 end
 
 --- One page forward or back; in a series, past either end steps to the
