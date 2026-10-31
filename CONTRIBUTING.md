@@ -73,7 +73,7 @@ Using KOReader's APIs (requiring its modules and widgets) is fine; that's how ev
 1. Fork the repository and create a branch from `main`.
 2. Keep each PR to one change, and explain what it does and why in the description. Screenshots help for anything visual.
 3. Add or update specs for any behaviour you change, and make sure `luajit spec/run.lua` passes.
-4. Only the files in `library.koplugin/` go on the device (9 right now). Keep runtime code in that folder, and if you add a file there, add it to `FILES` in the `Makefile`.
+4. Only the files in `library.koplugin/` go on the device (16 right now). Keep runtime code in that folder, and if you add a file there, add it to `FILES` in the `Makefile`. The release refuses to publish if that list and the folder disagree.
 5. Don't commit books, `.sdr` folders, KOReader settings or anything from your own device. `.gitignore` blocks the usual ones.
 6. Open the PR. I'll review it, may ask for changes, and merge it when it's ready.
 
@@ -82,3 +82,19 @@ Using KOReader's APIs (requiring its modules and widgets) is fine; that's how ev
 ```sh
 make zip VERSION=0.3.0    # dist/library-gui-0.3.0.zip and dist/SHA256SUMS
 ```
+
+`python3 tools/release.py` does that for the next version and prints the notes it would publish. It does not create the release unless `--publish` is passed, which is what GitHub Actions runs.
+
+## Releases
+
+A push to `main` that changes `library.koplugin/` runs [`.github/workflows/release.yml`](.github/workflows/release.yml). The same workflow can be started by hand from the Actions tab, on `main`.
+
+It runs `luajit spec/run.lua` first and does not publish if a test fails. It then tags the next `vX.Y.Z`, names the release `vX.Y.Z`, and marks it Latest. The assets are `library-gui-X.Y.Z.zip` (a top-level `library.koplugin/` folder, only the Makefile `FILES`) and `library-gui-X.Y.Z.zip.sha256`.
+
+The version bumps the patch number of the latest tag. Label a pull request that changed the plugin `release:minor` or `release:major` to bump that part instead, or `release:skip` to publish nothing. If more than one of those is set, skip wins, then major, then minor. The labels have to exist on the repository before they can be applied.
+
+Notes are plain-English bullets, one per pull request merged since the previous tag that changed the plugin, each with a `(#N)` reference. A re-run does not publish a second release when the plugin is unchanged, or when that version is already published.
+
+`_meta.lua` and `main.lua` have no version field. The README links to the latest release rather than a `releases/download/vX.Y.Z/library-gui-X.Y.Z.zip` URL. GitHub's `/releases/latest/download/` links only work when the file name stays the same, and this zip's name includes the version, so the README does not pin one. Publishing does not need a follow-up commit on `main`.
+
+Changes already on `main` before a release was tagged are included the next time the workflow runs. A push that does not touch `library.koplugin/` does not start it.
