@@ -27,6 +27,17 @@ Each spec file is listed in `spec/run.lua`. If you add a new one, add it to that
 
 Most changes should be checked on screen as well as in the tests.
 
+Screenshots, from the repository root:
+
+```sh
+tools/emulator/shoot.sh smoke     # one shot of the library, written to emulator-out/smoke/
+tools/emulator/shoot.sh footer    # footer "3 / 12", the Go to page dialog, and a long-press jump when the plugin has one
+```
+
+The first run downloads KOReader v2026.07.1 (Linux x86_64) into `~/.cache/koreader-library-gui/`, checks its sha256, and leaves the binary out of git. It seeds a public-domain library, copies `library.koplugin` into a temporary home, and runs KOReader under Xvfb at the Kindle Colorsoft size (1264×1680, 300 dpi). `EMU_OUT` sets the output directory. `EMU_PLUGIN` points at a different `library.koplugin` when the tree you want to shoot is not the one that contains the script. See [tools/emulator/README.md](tools/emulator/README.md).
+
+To poke at the emulator by hand:
+
 1. Build or download the KOReader desktop emulator (see KOReader's [building guide](https://github.com/koreader/koreader/blob/master/doc/Building.md)), or install the Linux AppImage.
 2. Copy or symlink `library.koplugin` into the emulator's plugins folder (`~/.config/koreader/plugins/` for the AppImage).
 3. To get a test library, generate public-domain dummy books:

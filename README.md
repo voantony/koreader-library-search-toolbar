@@ -93,7 +93,7 @@ Ideas came from [Project: Title](https://github.com/joshuacant/ProjectTitle), [S
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for running the tests and the emulator. Benchmarks are in [bench/RESULTS.md](bench/RESULTS.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the tests and the emulator. `tools/emulator/shoot.sh smoke` runs the plugin in headless KOReader and writes a PNG to `emulator-out/smoke/`. Benchmarks are in [bench/RESULTS.md](bench/RESULTS.md).
 
 ## Support
 

@@ -37,6 +37,7 @@ Thumbs.db
 
 # Emulator / benchmark output (docs/screenshots/ holds the curated, dummy-data shots)
 bench-out/
+emulator-out/
 dummy/
 dummy-library/
 results.lua
