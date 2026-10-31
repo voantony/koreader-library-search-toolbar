@@ -1,0 +1,42 @@
+name: Release
+
+# Publishes a GitHub release when library.koplugin changes on main.
+# The script no-ops when the plugin is unchanged or that version already exists.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "library.koplugin/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  # Labels and pull request text. contents: write can create the release,
+  # and leaving this unset would set it to none.
+  pull-requests: read
+
+concurrency:
+  group: library-gui-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install LuaJIT
+        run: sudo apt-get update && sudo apt-get install -y luajit zip
+
+      - name: Run specs
+        run: luajit spec/run.lua
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/release.py --publish
