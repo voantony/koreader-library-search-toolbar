@@ -28,6 +28,8 @@ vocabulary_builder.sqlite3
 *.cbz
 
 # Editors / OS
+__pycache__/
+*.pyc
 .DS_Store
 Thumbs.db
 *.swp
@@ -37,6 +39,7 @@ Thumbs.db
 
 # Emulator / benchmark output (docs/screenshots/ holds the curated, dummy-data shots)
 bench-out/
+emulator-out/
 dummy/
 dummy-library/
 results.lua
